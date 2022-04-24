@@ -17,24 +17,23 @@
 		<div id="background"></div>
 		<div class="container center">
 			<div class="MainDiv">
-				<div class="row mb-5">
-					<div class="col-12 d-flex justify-content-center">
-						<img src="{{ url_for('static', filename='/images/banner.png') }}" alt="WebPilot" id="BannerImg" />
+				<form method="" action="">
+					<div class="row mb-5">
+						<div class="col-12 d-flex justify-content-center">
+							<img src="{{ url_for('static', filename='/images/banner.png') }}" alt="WebPilot" id="BannerImg" />
+						</div>
 					</div>
-				</div>
-				<div class="row mb-3">
-					<div class="col-12 d-flex justify-content-center">
-						<input class="form-control form-control-lg rounded-pill" type="text" placeholder="Search here..." name="QueryBox" id="QueryBox" />
+					<div class="row mb-3">
+						<div class="col-12 d-flex justify-content-center">
+							<input class="form-control form-control-lg rounded-pill" type="text" placeholder="Search here..." name="QueryBox" id="QueryBox" />
+						</div>
 					</div>
-				</div>
-				<div class="row">
-					<div class="col-6 d-flex justify-content-end">
-						<button class="btn btn-light btn-lg rounded-pill" id="SearchButton"><i class="fa fa-search"></i> Search</button>
+					<div class="row">
+						<div class="col-12 d-flex justify-content-center">
+							<button class="btn btn-light btn-lg rounded-pill" id="SearchButton"><i class="fa fa-search"></i> Search</button>
+						</div>
 					</div>
-					<div class="col-6 d-flex justify-content-start">
-						<button class="btn btn-light btn-lg rounded-pill" id="AboutButton"><i class="fa fa-info-circle"></i> About us</button>
-					</div>
-				</div>
+				</form>
 			</div>
 		</div>
 	</body>

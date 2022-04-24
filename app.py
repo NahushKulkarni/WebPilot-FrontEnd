@@ -15,14 +15,9 @@ def search():
     return redirect(url_for('search_query', query=query))
 
 
-@app.route('/<query>')
-def search_query(query):
-    return render_template('search.html', search=search)
-
-
-@app.route('/about')
-def about():
-    return render_template('about.html')
+@app.route('/results/')
+def Results():
+    return render_template('results.html', Results=Results)
 
 
 app.run(debug=True, port=5000)
