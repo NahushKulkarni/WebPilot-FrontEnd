@@ -4,7 +4,7 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>WebPilot - {{QueryTitle}}</title>
+		<title>WebPilot - {{Query}}</title>
 		<link icon="{{ url_for('static', filename='/images/favicon.png') }}" rel="shortcut icon" />
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" integrity="sha512-KfkfwYDsLkIlwQp6LFnl8zNdLGxu9YAA1QvwINks4PhcElQSvqcyVLLD9aMhXd13uQjoXtEKNosOWaZqXgel0g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 		<script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
@@ -13,35 +13,159 @@
 		<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js"></script>
 	</head>
+	<style>
+		.page-item{
+			cursor: pointer;
+			font-weight: bold;
+		}
+		.page-item.active {
+			background-color: #f5f5f5;
+			border-color: #f5f5f5;
+		}
+		a{
+			text-decoration: none;
+		}
+		.contact-item{
+			list-style: none;
+			font-weight: bold;
+		}
+		.page-title{
+			cursor: pointer;
+		}
+		.zoom {
+			transition: transform 0.2s;
+		}
+		.zoom:hover {
+			-ms-transform: scale(1.1);
+			-webkit-transform: scale(1.1);
+			transform: scale(1.1);
+		}
+		.media-item{
+			max-width: 25vw;
+		}
+		.modal-dialog{
+			max-width: 75vw !important;
+			opacity: 90%;
+			backdrop-filter: blur(5px);
+			--webkit-backdrop-filter: blur(5px);
+		}
+	</style>
 	<body>
 		<nav class="navbar navbar-dark bg-dark">
 			<div class="container-fluid">
-				<a class="navbar-brand" href="#">
+				<a class="navbar-brand" href="/">
 					<img src="{{ url_for('static', filename='/images/banner.png') }}" alt="WebPilot" class="d-inline-block align-text-top" height="30px" />
 				</a>
-				<form class="d-flex" style="width: 35%">
-					<input class="form-control rounded-pill bg-dark border-light text-light" type="text" placeholder="Search here..." name="QueryBox" id="QueryBox" />
+				<form class="d-flex" style="width: 35%" method="POST" action="/">
+					<input class="form-control rounded-pill bg-dark border-light text-light" type="text" placeholder="Search here..." name="QueryBox" id="QueryBox" value="{{Query}}" />
 					<span style="width: 10px"></span>
 					<button class="btn btn-success rounded-pill" id="SearchButton" style="height: 40px"><i class="fa fa-search"></i></button>
 				</form>
 			</div>
 		</nav>
 
-		<div class="container">
-			{% for Page in Results %}
-			<div class="row mt-3" style="cursor: pointer" onclick="window.open('{{Page.URL}}');">
+		{%if Error|length > 0%}
+		<div class="container mt-5">
+			<div class="row">
+				<div class="col-md-12 text-center">
+					<h1>{{Error}}</h1>
+				</div>
+		</div>
+		{%endif%}
+
+		{%if Error|length == 0%}
+		<div class="container d-flex justify-content-center mt-1">
+			<ul class="pagination pagination-lg" id="Pagination-ul"></ul>
+		</div>
+		{%endif%}
+		
+
+		<div id="MainDiv">
+		{% for List in Results %}
+		<script>
+			$(document).ready(function () {
+				$("#Pagination-ul").append('<li class="page-item m-2 {%if loop.index == 1 %}active text-primary{%endif%}" id="Page{{loop.index}}-link" onclick="changePage({{loop.index}});">{{loop.index}}</li>');
+			});
+		</script>
+		<div class="container mb-2" id="Page{{loop.index}}" class="{%if loop.index != 1 %}d-none{%endif%}">
+			{% for Page in List %}
+			<div class="row mt-1 zoom">
 				<div class="col-md-12">
-					<div class="card">
-						<div class="card-header text-success">{{Page.URL}}</div>
+					<div class="card border-1 border-secondary">
+						<div class="card-header text-success">{% if Page.Logo|length > 0 %}<img src="{{Page.Logo}}" style="height: 24px; width: 24px" />{%endif%} {{Page.URL}}</div>
 						<div class="card-body">
-							<h5 class="card-title {%if Page.Title|length==0 %}d-none{%endif%}">{{Page.Title}}</h5>
-							<p class="card-text {%if Page.Description|length==0 %}d-none{%endif%}">{{Page.Description}}</p>
+							<div class="card-title {%if Page.Title|length==0 %}d-none{%endif%}">
+								<div class="row">
+									<div class="col-11">
+										<h5 class="page-title" onclick="window.open('{{Page.URL}}');">{{Page.Title}}</h5>
+									</div>
+									{%if Page.Media|length > 0 %}
+									<div class="col-1">
+										<button class="btn btn-outline-secondary rounded" onclick="$('#Model-{{Page.Count}}').modal('show');">
+											<i class="fa fa-images"></i>
+										</button>
+									</div>
+									{%endif%}
+								</div>
+							</div>
+							<p class="card-text pt-2 {%if Page.Description|length<10 %}d-none{%endif%}">{{Page.Description}}</p>
 						</div>
-						<div class="card-footer {%if Page.Summary|length==0 %}d-none{%endif%}">{{Page.Summary}}</div>
+						<div class="card-footer {%if Page.Summary|length<10 %}d-none{%endif%}">{{Page.Summary}}</div>
+						<div class="card-footer pt-2 {%if Page.Contacts|length == 0 %}d-none{%endif%}">
+							<ul class="d-inline-flex p-0">
+							{% for Contact in Page.Contacts %}
+								<li class="contact-item"><a href="{{Contact.URL}}">{{Contact.Text}}</a></li>
+							{% endfor %}
+							</ul>
+						</div>
 					</div>
 				</div>
 			</div>
-			{% endfor %}
+			{%if Page.Media|length > 0%}
+			<div class="modal hide fade" id="Model-{{Page.Count}}">
+				<div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title">{{Page.Title}}</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+							<div class="row">
+								{% for Media in Page.Media %}
+								<div class="col-4 p-4">
+									<object data="{{Media}}" class="media-item"></object>
+								</div>
+								{%endfor%}
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			{%endif%} {% endfor %}
+		</div>
+		{% endfor %}
 		</div>
 	</body>
+
+	<script>
+		$("#QueryBox").on("keyup", function (e) {
+			if (e.key === "Enter" || e.keyCode === 13) {
+				$("#SearchButton").click();
+			}
+		});
+		function changePage(number) {
+			$("#Page" + number).removeClass("d-none");
+			$("#Page" + number)
+				.siblings()
+				.addClass("d-none");
+			$("#Page" + number + "-link").addClass("active");
+			$("#Page" + number + "-link").addClass("text-primary");
+			$("#Page" + number + "-link")
+				.siblings()
+				.removeClass("active");
+			$("#Page" + number + "-link")
+				.siblings()
+				.removeClass("text-primary");
+		}
+	</script>
 </html>

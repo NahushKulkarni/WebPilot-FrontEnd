@@ -17,7 +17,7 @@
 		<div id="background"></div>
 		<div class="container center">
 			<div class="MainDiv">
-				<form method="" action="">
+				<form method="POST" action="/">
 					<div class="row mb-5">
 						<div class="col-12 d-flex justify-content-center">
 							<img src="{{ url_for('static', filename='/images/banner.png') }}" alt="WebPilot" id="BannerImg" />
@@ -25,7 +25,7 @@
 					</div>
 					<div class="row mb-3">
 						<div class="col-12 d-flex justify-content-center">
-							<input class="form-control form-control-lg rounded-pill" type="text" placeholder="Search here..." name="QueryBox" id="QueryBox" />
+							<input class="form-control form-control-lg rounded-pill" type="text" placeholder="Search here..." name="QueryBox" id="QueryBox" onkeypress="" />
 						</div>
 					</div>
 					<div class="row">
@@ -50,6 +50,12 @@
 			minHeight: 200.0,
 			minWidth: 200.0,
 			baseColor: BaseColor,
+		});
+
+		$("#QueryBox").on("keyup", function (e) {
+			if (e.key === "Enter" || e.keyCode === 13) {
+				$("#SearchButton").click();
+			}
 		});
 	</script>
 	<style>
